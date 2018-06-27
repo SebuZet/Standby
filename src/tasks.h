@@ -14,31 +14,39 @@
 #include "pch.h"
 #include "const.h"
 
-#define CTC_MATCH_OVERFLOW ((F_CPU / 1000) / 8)
-
-enum Schedule_t {
-  TASK_REPEAT = 0,
-  TASK_SCHEDULE = 1
+enum Schedule_t
+{
+	TASK_REPEAT = 0,
+	TASK_SCHEDULE = 1
 };
 
-struct Task {
-  // list containing all tasks
-  struct Task* next;
+struct Task
+{
+	// list containing all tasks
+	struct Task* next;
 
-  // node values
-  uint16_t millis;
-  enum Schedule_t schedule;
-  void (*listener)(void);
-  void (*callback)(void);
+	// node values
+	uint16_t millis;
+	enum Schedule_t schedule;
+	
+	void (*listener)(void);
+	void (*callback)(void);
 
-  // ticks related values
-  uint16_t ticks;
-  BOOL running;
+	// ticks related values
+	uint16_t ticks;
+	BOOL running;
+	BOOL enabled;
 };
 
-void Tasks_init(void);
+void Tasks_tick_ms(void);
+
 void Tasks_poll(void);
-uint16_t Tasks_size(void);
+uint16_t Tasks_count(void);
+
 struct Task* Tasks_create(uint16_t millis, enum Schedule_t schedule, void (*listener)(void), void (*callback)(void));
+
+BOOL Tasks_disable(struct Task* pTask);
+BOOL Tasks_enable(struct Task* pTask);
+BOOL Tasks_restart(struct Task* pTask);
 
 #endif

@@ -12,15 +12,16 @@
 #define BUTTON_H_
 
 #include "pch.h"
+#include "const.h"
 
-enum Buttonstate_t {
+enum Buttonstate_t
+{
   BUTTON_IDLE,
   BUTTON_PUSHED,
-  BUTTON_RELEASED,
-  BUTTON_HOLD
 };
 
-struct ButtonNode {
+struct ButtonNode
+{
   // next entry within the list
   struct ButtonNode* next;
 
@@ -30,5 +31,6 @@ struct ButtonNode {
 
 void Button01_init(void);
 void Button01_join(void (*listener)(enum Buttonstate_t));
+BOOL Button01_isPressed();
 
 #endif

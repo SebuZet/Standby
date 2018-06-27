@@ -12,17 +12,19 @@
 #define CONFIG_H_
 
 #include "pch.h"
-#include "remote.h"
+#include "irmp/irmp.h"
 
 #define CONFIG_MAGIC 0x64FD
 #define CONFIG_LOCATION 0x0A
 
-struct Config {
-  // remote code
-  uint16_t remoteCode;
-
-  // magic value
-  uint16_t magic;
+struct Config
+{
+	// remote codes
+	IRMP_DATA remoteCodeOn;
+	IRMP_DATA remoteCodeOff;
+	
+	// magic value
+	uint16_t magic;
 } __attribute__((packed));
 
 void Config_init(void);

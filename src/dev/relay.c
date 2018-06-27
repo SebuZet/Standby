@@ -12,26 +12,26 @@
 
 void Relay_init(void)
 {
-  DDRC |= _BV(2);
-  PORTC &= ~(_BV(2));
+	DDRC  |= _BV(2);
+	PORTC &= ~(_BV(2));
 }
 
 void Relay_on(void)
 {
-  PORTC |= _BV(2);
+	PORTC |= _BV(2);
 }
 
 void Relay_off(void)
 {
-  PORTC &= ~(_BV(2));
+	PORTC &= ~(_BV(2));
 }
 
 void Relay_toggle(void)
 {
-  PORTC ^= _BV(2);
+	PORTC ^= _BV(2);
 }
 
 uint8_t Relay_get(void)
 {
-  return (PORTC & _BV(2)) == _BV(2);
+	return (PORTC & _BV(2)) == _BV(2);
 }

@@ -15,39 +15,42 @@ struct Config* config = NULL;
 
 void Config_init(void)
 {
-  if(config == NULL) {
-    config = (struct Config*)malloc(sizeof(struct Config));
-  }  
+	if (config == NULL)
+	{
+		config = (struct Config*)malloc(sizeof(struct Config));
+	}
 
-  // wait until EEPROM is ready
-  eeprom_busy_wait();
+	// wait until EEPROM is ready
+	eeprom_busy_wait();
 
-  // load config from EEPROM
-  eeprom_read_block(config, (void*)CONFIG_LOCATION, sizeof(struct Config));
+	// load config from EEPROM
+	eeprom_read_block(config, (void*)CONFIG_LOCATION, sizeof(struct Config));
 
-  // check magic value
-  if(config->magic != CONFIG_MAGIC)
-    Config_reset();
+	// check magic value
+	if (config->magic != CONFIG_MAGIC)
+	{
+		Config_reset();
+	}
 }
 
 struct Config* Config_get(void)
 {
-  return config;
+	return config;
 }
 
 void Config_save(void)
 {
-  // wait until EEPROM is ready
-  eeprom_busy_wait();
+	// wait until EEPROM is ready
+	eeprom_busy_wait();
 
-  // save config to EEPROM
-  eeprom_write_block(config, (void*)CONFIG_LOCATION, sizeof(struct Config));
+	// save config to EEPROM
+	eeprom_write_block(config, (void*)CONFIG_LOCATION, sizeof(struct Config));
 }
 
 void Config_reset(void)
 {
-  memset(config, 0, sizeof(struct Config));
+	memset(config, 0, sizeof(struct Config));
 
-  // magic value
-  config->magic = CONFIG_MAGIC;
+	// magic value
+	config->magic = CONFIG_MAGIC;
 }

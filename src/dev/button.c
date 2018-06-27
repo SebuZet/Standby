@@ -23,56 +23,71 @@ uint8_t button01IdleNext = FALSE;
 
 void __Button01_dispatch(void)
 {
-  if(button01IdleNext) {
-    button01State = BUTTON_IDLE;
-    button01IdleNext = FALSE;
-  }
+	if (button01IdleNext)
+	{
+		button01State = BUTTON_IDLE;
+		button01IdleNext = FALSE;
+	}
 
-  if(button01State != BUTTON_IDLE) {
-    struct ButtonNode* node = button01Listeners;
-    while(node) {
-      node->listener(button01State);
-      node = node->next;
-    }
+	if (button01State != BUTTON_IDLE)
+	{
+		struct ButtonNode* node = button01Listeners;
+		while (node)
+		{
+			node->listener(button01State);
+			node = node->next;
+		}
 
-    button01IdleNext = TRUE;
-  }
+		button01IdleNext = TRUE;
+	}
 }
 
 void __Button01_poll(void)
 {
-  if((PINC & (1 << 1)) == 0)
-    button01State = BUTTON_PUSHED;
+	if ((PINC & _BV(1)) == 0)
+	{
+		button01State = BUTTON_PUSHED;
+	}
 }
 
 void Button01_init(void)
 {
-  DDRC |= 1 << 1;
-  PORTC |= 1 << 1;
+	DDRC  |= _BV(1);
+	PORTC |= _BV(1);
 
-  // create tasks
-  Tasks_create(100, TASK_REPEAT, __Button01_poll, NULL);
-  Tasks_create(400, TASK_REPEAT, __Button01_dispatch, NULL);
+	// create tasks
+	Tasks_create(100, TASK_REPEAT, __Button01_poll, NULL);
+	Tasks_create(400, TASK_REPEAT, __Button01_dispatch, NULL);
 }
 
 void Button01_join(void (*listener)(enum Buttonstate_t))
 {
-  struct ButtonNode* node = (struct ButtonNode*)malloc(sizeof(struct ButtonNode));
+	struct ButtonNode* node = (struct ButtonNode*)malloc(sizeof(struct ButtonNode));
 
-  // it will be the last entry, so no next node
-  node->next = NULL;
+	// it will be the last entry, so no next node
+	node->next = NULL;
 
-  // node values
-  node->listener = listener;
+	// node values
+	node->listener = listener;
 
-  if(button01Listeners == NULL) { // no main node yet
-    button01Listeners = node;
-    } else {
-    struct ButtonNode* parent = button01Listeners;
-    while(parent->next) {
-      parent = parent->next;
-    }
+	if (button01Listeners == NULL) // no main node yet
+	{
+		button01Listeners = node;
+	}
+	else
+	{
+		struct ButtonNode* parent = button01Listeners;
+		while (parent->next)
+		{
+			parent = parent->next;
+		}
 
-    parent->next = node;
-  }
+		parent->next = node;
+	}
 }
+
+BOOL Button01_isPressed()
+{
+	return ((PINC & _BV(1)) == 0)? TRUE : FALSE;
+}
+

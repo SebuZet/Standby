@@ -12,46 +12,33 @@
 #define PREAMP_H_
 
 #include "pch.h"
-#include "remote.h"
 #include "tasks.h"
 #include "dev/button.h"
 
 #define STANDBY_IGNORE_REMOTE 10
 
-enum StandbyMode_t {
-  STANDBY_MODE_NORMAL = 0,
-  STANDBY_MODE_LEARN = 1,
+enum StandbyMode_t
+{
+	STANDBY_MODE_STARTING = 0,
+	STANDBY_MODE_NORMAL,
+	STANDBY_MODE_GOING_TO_STANDBY,
+	STANDBY_MODE_LEARN_POWER_ON,
+	STANDBY_MODE_LEARN_POWER_OFF,
 
-  // const
-  STANDBY_MODE_LAST = STANDBY_MODE_LEARN
+	// const
+	STANDBY_MODE_LAST = STANDBY_MODE_LEARN_POWER_OFF
 };
 
-struct Standby {
-  struct Config* config;
-
-  enum StandbyMode_t mode;
-
-  uint8_t buttonClicks;
-
-  uint8_t mustSaveConfig;
-  uint8_t mustIgnoreRemote;
-
-  struct Task* timeoutTask;
-  struct Task* blinkTask;
-  struct Task* modeTask;
+struct Standby
+{
+	struct Config*		config;
+	enum StandbyMode_t	mode;
+	uint8_t				mustIgnoreRemote;
+	struct Task*		blinkTask;
 };
 
 extern struct Standby* standby;
 
 void Standby_init(void);
-void Standby_blink(void);
-void Standby_update(void);
-void Standby_timeout(void);
-void Standby_mode(void);
-void Standby_button(enum Buttonstate_t state);
-void Standby_remote(void);
-
-void Standby_toggle(void);
-void Standby_sync(void);
 
 #endif
