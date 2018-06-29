@@ -1,11 +1,11 @@
-# Instructions for AVR programming
+## Instructions for AVR programming
 * All informations are extracted from [here](https://ssl.diyaudio.pl/showthread.php/25577-2-kana%C5%82owy-preamp-na-PGA2320?p=450599&viewfull=1#post450599 "Programming with WinAVR")
 
-# Requirements for Windows
+## Requirements for Windows
 * Install WinAVR
 * Drivers for programmer
 
-# Commands
+## Commands
 ### Init device
 
 avrdude -c usbasp -p m32 -F
@@ -17,7 +17,6 @@ Example output:
 > avrdude: safemode: Fuses OK
 > avrdude done.  Thank you.
 
-avrdude done.  Thank you.
 ### Programming fuse-bits
 
 avrdude -c usbasp -p m32 -F -U lfuse:w:0xff:m -U hfuse:w:0xd9:m
