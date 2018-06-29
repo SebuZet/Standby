@@ -142,21 +142,22 @@ void Standby_RcuHandler(void)
 {
 	IRMP_DATA irmp_data;
 
+	if (standby->mustIgnoreRemote > 0)
+	{
+		--standby->mustIgnoreRemote;
+	}
+
 	if (irmp_get_data (&irmp_data))
 	{
-		if (standby->mustIgnoreRemote > 0)
-			--standby->mustIgnoreRemote;
-
 		switch (standby->mode)
 		{
 			case STANDBY_MODE_LEARN_POWER_ON:
 			{
-				if (standby->mustIgnoreRemote == 0)
-				{
-					standby->config->remoteCodeOn = irmp_data;
-					standby->mode = STANDBY_MODE_LEARN_POWER_OFF;
-					standby->mustIgnoreRemote = STANDBY_IGNORE_REMOTE;			
-				}
+				standby->config->remoteCodeOn = irmp_data;
+				standby->mode = STANDBY_MODE_LEARN_POWER_OFF;
+				standby->mustIgnoreRemote = STANDBY_IGNORE_REMOTE;			
+				LED_on(LED_POWER_ON);
+				Tasks_restart(standby->blinkTask);		
 				break;
 			}
 			
@@ -191,17 +192,19 @@ void Standby_RcuHandler(void)
 					bSwitchStandby = doesRcuCodeMatch(irmp_data, standby->config->remoteCodeOn);
 				}
 
-				if (bSwitchStandby)
+				if (bSwitchStandby && standby->mustIgnoreRemote == 0)
 				{
-					if (standby->mustIgnoreRemote == 0)
+					Standby_TryToggleMode();
+					
+					standby->mustIgnoreRemote = STANDBY_IGNORE_REMOTE;
+					if (Relay_get())
 					{
-						Standby_TryToggleMode();
-						standby->mustIgnoreRemote = STANDBY_IGNORE_REMOTE;
-	
-						// blink
-						LED_on(LED_MAIN);
-						Tasks_restart(standby->blinkTask);
+						standby->mustIgnoreRemote += STANDBY_IGNORE_REMOTE; // yes, double ignor time when powering on
 					}
+	
+					// blink
+					LED_on(LED_MAIN);
+					Tasks_restart(standby->blinkTask);
 				}
 
 				break;
@@ -212,7 +215,6 @@ void Standby_RcuHandler(void)
 				break;
 			
 			default:
-				standby->mustIgnoreRemote = 0;
 				// TODO: send RCU command via UART
 				break;
 		}
