@@ -172,7 +172,7 @@ BOOL Tasks_restart(struct Task* pTask)
 {
 	if (pTask != NULL && pTask->enabled)
 	{
-		pTask->millis = 0;
+		pTask->ticks = 0;
 		return TRUE;
 	}
 

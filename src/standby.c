@@ -112,6 +112,7 @@ void Standby_LedsBlinkingHandler(void)
 	else if (standby->mode == STANDBY_MODE_LEARN_POWER_OFF || standby->mode == STANDBY_MODE_LEARN_POWER_ON)
 	{
 		LED_toggle(LED_MAIN);
+		LED_off(LED_POWER_ON);
 	}
 }
 
@@ -153,11 +154,14 @@ void Standby_RcuHandler(void)
 		{
 			case STANDBY_MODE_LEARN_POWER_ON:
 			{
-				standby->config->remoteCodeOn = irmp_data;
-				standby->mode = STANDBY_MODE_LEARN_POWER_OFF;
-				standby->mustIgnoreRemote = STANDBY_IGNORE_REMOTE;			
-				LED_on(LED_POWER_ON);
-				Tasks_restart(standby->blinkTask);		
+				if (standby->mustIgnoreRemote == 0)
+				{
+					standby->config->remoteCodeOn = irmp_data;
+					standby->mode = STANDBY_MODE_LEARN_POWER_OFF;
+					standby->mustIgnoreRemote = STANDBY_IGNORE_REMOTE;			
+					LED_on(LED_POWER_ON);
+					Tasks_restart(standby->blinkTask);
+				}
 				break;
 			}
 			
@@ -199,7 +203,7 @@ void Standby_RcuHandler(void)
 					standby->mustIgnoreRemote = STANDBY_IGNORE_REMOTE;
 					if (Relay_get())
 					{
-						standby->mustIgnoreRemote += STANDBY_IGNORE_REMOTE; // yes, double ignor time when powering on
+						standby->mustIgnoreRemote += STANDBY_IGNORE_REMOTE; // yes, double ignore time when powering on
 					}
 	
 					// blink
@@ -256,14 +260,14 @@ void Standby_TryToggleMode(void)
 		if (Relay_get() && Player_isConnected())
 		{
 			standby->mode = STANDBY_MODE_GOING_TO_STANDBY;		// set mode to proper one
-			Player_NotifySystemShutDown(TRUE);							// inform SBC that system is going down
+			Player_NotifySystemShutDown(TRUE);					// inform SBC that system is going down
 			Tasks_create(CONFIG_PLAYER_POWEROFF_TIMEOUT, TASK_SCHEDULE, Standby_PowerOffTimeout, NULL);
 			Tasks_restart(standby->blinkTask);					// reset timeout
 			Standby_SynchronizeLeds();
 		}
 		else
 		{
-			Standby_ToggleMode();								// switch standby ode
+			Standby_ToggleMode();								// switch standby mode
 		}
 	}
 }
@@ -288,8 +292,8 @@ void Standby_SynchronizeLeds(void)
 
 		case STANDBY_MODE_GOING_TO_STANDBY:
 		{
-			LED_on(LED_POWER_ON);
 			LED_off(LED_POWER_OFF);
+			LED_off(LED_MAIN);
 			break;
 		}
 
@@ -299,13 +303,6 @@ void Standby_SynchronizeLeds(void)
 			LED_off(LED_POWER_ON);
 			LED_off(LED_POWER_OFF);
 			break;
-		}
-		
-		default: // error???
-		{
-			LED_on(LED_POWER_ON);
-			LED_on(LED_POWER_OFF);
-			LED_on(LED_MAIN);
 		}
 	}
 }
