@@ -126,8 +126,8 @@ struct Task* Tasks_create(uint16_t millis, enum Schedule_t schedule, void (*list
 			current->callback = NULL;
 		}
 
-		if (tasks == NULL)
-		{ // no main node yet
+		if (tasks == NULL) // no main node yet
+		{ 
 			tasks = node;
 		}
 		else
@@ -160,7 +160,7 @@ BOOL Tasks_enable(struct Task* pTask)
 {
 	if (pTask != NULL && pTask->enabled == FALSE)
 	{
-		pTask->millis = 0;
+		pTask->ticks = 0;
 		pTask->enabled = TRUE;
 		return TRUE;
 	}
