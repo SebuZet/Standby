@@ -3,13 +3,12 @@
 # SBC should monitor 'Shutdown' pin. After detecting HIGH signal SBC should power down itself
 # author: Sebastian Zaorski
 import RPi.GPIO as GPIO
-import time
-import os
-import configparser
+import RPi.GPIO as GPIO
+import time, os, sys, configparser
 
 # reads configuration file
 config = configparser.ConfigParser()
-config.read_file(open('standby.ini'))
+config.read_file(open(os.path.dirname(sys.argv[0]) + '/standby.ini'))
 
 # Shutdown function
 def Shutdown(channel):
