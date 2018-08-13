@@ -5,12 +5,11 @@
 # author: Sebastian Zaorski
 
 import RPi.GPIO as GPIO
-import os
-import configparser, os
+import os, sys, configparser
 
 # reads configuration file
 config = configparser.ConfigParser()
-config.read_file(open('standby.ini'))
+config.read_file(open(os.path.dirname(sys.argv[0]) + '/standby.ini'))
 
 # check if 'Communication' section exist
 if config.has_section('Communication'):
